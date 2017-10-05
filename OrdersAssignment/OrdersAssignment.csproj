@@ -158,6 +158,10 @@
     <Compile Include="Migrations\201710051706461_Initial Models added.Designer.cs">
       <DependentUpon>201710051706461_Initial Models added.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710051954479_Added deleted flag to models.cs" />
+    <Compile Include="Migrations\201710051954479_Added deleted flag to models.Designer.cs">
+      <DependentUpon>201710051954479_Added deleted flag to models.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\Order.cs" />
@@ -225,6 +229,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201710051706461_Initial Models added.resx">
       <DependentUpon>201710051706461_Initial Models added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710051954479_Added deleted flag to models.resx">
+      <DependentUpon>201710051954479_Added deleted flag to models.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

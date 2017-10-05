@@ -13,6 +13,14 @@ namespace OrdersAssignment.Controllers
 
         public ActionResult Add([Bind(Include = bind)] Customer customer)
         {
+            // Do we actually have an object?
+            if (customer == null)
+            {
+                return Json(new Msg { Result = "Error", Message = "Customer cannot be null." });
+            }
+
+            customer.IsDeleted = false; // I don't care what the user wants; it's stupid to add something that's already deleted.
+
             // Check for errors in the ModelState
             if (ModelState.IsValid)
             {
@@ -25,13 +33,44 @@ namespace OrdersAssignment.Controllers
                 {
                     return Json(new Msg { Result = "Error", Message = e.Message });
                 }
+
+                // We didn't blow up! Announce our success.
                 return Json(new Msg { Result = "Success", Message = "Placeholder" });
             }
+
+            // If we wind up down here, something went wrong.
             return Json(new Msg { Result = "Placeholder", Message = "Placeholder" });
         }
 
         public ActionResult Delete(int? id)
         {
+            // Do we have a value and is it in range?
+            if (id == null || id <= 0)
+                return Json(new Msg { Result = "Error", Message = "Invalid Customer.Id: out of range." });
+
+            // Try and find a customer
+            Customer customer = db.Customers.Find(id);
+
+            // Couldn't find a customer; return an error
+            if (customer == null)
+                return Json(new Msg { Result = "Error", Message = "Invalid CUstomer.Id" });
+
+            // 'delete' our customer
+            customer.IsDeleted = true;
+
+            // Save changes
+            if (ModelState.IsValid)
+            {
+                db.Entry(customer).State = System.Data.Entity.EntityState.Modified;
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    return Json(new Msg { Result = "Error", Message = e.Message });
+                }
+            }
             return Json(new Msg { Result = "Placeholder", Message = "Placeholder" });
         }
 
@@ -42,8 +81,8 @@ namespace OrdersAssignment.Controllers
 
             Customer customer = db.Customers.Find(id);  // Attempt to find a customer with the given id
 
-            if (customer == null)   // Is there a customer with the given id?
-                return Json(new Msg { Result = "Error", Message = "Invalid CUstomer.Id." });
+            if (customer == null || customer.IsDeleted == true)   // Is there a customer with the given id?
+                return Json(new Msg { Result = "Error", Message = "Invalid Customer.Id." });
 
             // Send out the selected customer in JSON format
             return new JsonNetResult { Data = customer };
@@ -51,12 +90,19 @@ namespace OrdersAssignment.Controllers
 
         public ActionResult List()
         {
-            // Send out a list of Customers in JSON format
-            return new JsonNetResult { Data = db.Customers.ToList() };
+            // Send out a list of Customers in JSON format (ignoring those that are 'deleted')
+            return new JsonNetResult { Data = db.Customers.Where(c => c.IsDeleted == false).ToList() };
         }
 
         public ActionResult Update([Bind(Include = bind)] Customer customer)
         {
+            // Did we actually get a customer?
+            if (customer == null)
+                return Json(new Msg { Result = "Error", Message = "Customer cannot be null." });
+
+            // If we just updated it, it can't be deleted...
+            customer.IsDeleted = false;
+
             if (ModelState.IsValid)     // If all our data look ok.
             {
                 db.Entry(customer).State = System.Data.Entity.EntityState.Modified; // Flag this customer as Modified

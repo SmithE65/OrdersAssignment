@@ -20,5 +20,8 @@ namespace OrdersAssignment.Models
 
         [Required]
         public decimal CreditLimit { get; set; }  // type double in specs
+
+        [Required]
+        public bool IsDeleted { get; set; }  // have we been deleted yet???
     }
 }

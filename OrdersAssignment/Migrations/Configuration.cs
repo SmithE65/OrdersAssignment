@@ -4,6 +4,7 @@ namespace OrdersAssignment.Migrations
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using OrdersAssignment.Models;
 
     internal sealed class Configuration : DbMigrationsConfiguration<OrdersAssignment.Models.OrdersAssignmentContext>
     {
@@ -26,6 +27,13 @@ namespace OrdersAssignment.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+
+            context.Customers.AddOrUpdate(c => c.Name,
+                new Customer { Name = "cust1", CreditLimit = 1000m, IsDeleted = false },
+                new Customer { Name = "cust2", CreditLimit = 750m, IsDeleted = false },
+                new Customer { Name = "cust3", CreditLimit = 500m, IsDeleted = false },
+                new Customer { Name = "cust4", CreditLimit = 7500m, IsDeleted = false }
+                );
         }
     }
 }
