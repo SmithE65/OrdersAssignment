@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using OrdersAssignment.Models;
 using OrdersAssignment.Utilities;
 
@@ -16,7 +9,7 @@ namespace OrdersAssignment.Controllers
         private OrdersAssignmentContext db = new OrdersAssignmentContext();
         private const string bind = "Id,OrderNbr,DateReceived,CustomerId,Total";
 
-        public ActionResult Add([Bind(Include = bind)] Customer customer)
+        public ActionResult Add([Bind(Include = bind)] Order order)
         {
             return Json(new Msg { Result = "Placeholder", Message = "Placeholder" });
         }
@@ -36,7 +29,7 @@ namespace OrdersAssignment.Controllers
             return Json(new Msg { Result = "Placeholder", Message = "Placeholder" });
         }
 
-        public ActionResult Update([Bind(Include = bind)] Customer customer)
+        public ActionResult Update([Bind(Include = bind)] Order order)
         {
             return Json(new Msg { Result = "Placeholder", Message = "Placeholder" });
         }
