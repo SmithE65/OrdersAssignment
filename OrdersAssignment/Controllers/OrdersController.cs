@@ -19,11 +19,16 @@ namespace OrdersAssignment.Controllers
                 return Json(new Msg { Result = "Error", Message = "Order cannot be null." });
             }
 
+            if (db.Customers.Find(order.CustomerId) == null)
+                return Json(new Msg { Result = "Error", Message = "Invalid Customer.Id." });
+
             order.IsDeleted = false; // I don't care what the user wants; it's stupid to add something that's already deleted.
 
             // Check for errors in the ModelState
             if (ModelState.IsValid)
             {
+                if (!Validate(order))
+                    return Json(new Msg { Result = "Error", Message = "Order failed validation; check credit limit." });
                 try // These things can blow up
                 {
                     db.Orders.Add(order); // Put the customer in the local cache
@@ -100,11 +105,17 @@ namespace OrdersAssignment.Controllers
             if (order == null)
                 return Json(new Msg { Result = "Error", Message = "Customer cannot be null." });
 
+            if (db.Customers.Find(order.CustomerId) == null)
+                return Json(new Msg { Result = "Error", Message = "Invalid Customer.Id." });
+
             // If we just updated it, it can't be deleted...
             order.IsDeleted = false;
 
             if (ModelState.IsValid)     // If all our data look ok.
             {
+                if (!Validate(order))   // Check total against credit limit & other validation
+                    return Json(new Msg { Result = "Error", Message = "Order failed validation; check credit limit." });
+
                 db.Entry(order).State = System.Data.Entity.EntityState.Modified; // Flag this customer as Modified
                 try     // In case anything goes wrong
                 {
@@ -122,6 +133,20 @@ namespace OrdersAssignment.Controllers
             return Json(new Msg { Result = "Placeholder", Message = "Placeholder" });
         }
 
+        private bool Validate(Order order)
+        {
+            Customer customer = db.Customers.Find(order.CustomerId);
+
+            if (customer == null)   // if the customer doesn't exist, fail
+                return false;
+
+            if (customer.CreditLimit < order.Total)
+                return false;       // do they have enough credit with us for this purchase?
+
+            // We can do other data validation in here as well
+
+            return true;            // if we haven't failed yet, let's assume we're good
+        }
 
         protected override void Dispose(bool disposing)
         {
